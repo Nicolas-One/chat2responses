@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Chat2Responses 管理面板</title>
+        <style>
+            * {
+                margin:0;
+                padding:0;
+                box-sizing:border-box
+            }
+            body {
+                font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background:#f5f5f5;
+                color:#333;
+                line-height:1.6
+            }
+            .container {
+                max-width:900px;
+                margin:0 auto;
+                padding:24px 16px
+            }
+            h1 {
+                font-size:22px;
+                font-weight:600;
+                margin-bottom:4px
+            }
+            .subtitle {
+                color:#666;
+                font-size:13px;
+                margin-bottom:28px
+            }
+            .top-bar {
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:28px
+            }
+            .top-bar .title-group {
+                flex:1
+            }
+            .top-bar .save-area {
+                flex-shrink:0
+            }
+            .btn-save-top {
+                padding:10px 28px;
+                border-radius:6px;
+                font-size:14px;
+                font-weight:600;
+                cursor:pointer;
+                border:none;
+                transition:all .2s;
+                background:#1677ff;
+                color:#fff
+            }
+            .btn-save-top:hover {
+                background:#4096ff
+            }
+            .btn-save-top:active {
+                transform:scale(.97)
+            }
+            .card {
+                background:#fff;
+                border-radius:8px;
+                box-shadow:0 1px 3px rgba(0, 0, 0, .08);
+                padding:24px;
+                margin-bottom:20px
+            }
+            .card h2 {
+                font-size:15px;
+                font-weight:600;
+                margin-bottom:16px;
+                color:#222
+            }
+            .form-group {
+                margin-bottom:14px
+            }
+            .form-group:last-child {
+                margin-bottom:0
+            }
+            .form-group label {
+                display:block;
+                font-size:13px;
+                font-weight:500;
+                color:#555;
+                margin-bottom:5px
+            }
+            .form-group input, .form-group textarea {
+                width:100%;
+                padding:8px 12px;
+                border:1px solid #d9d9d9;
+                border-radius:6px;
+                font-size:13px;
+                font-family:monospace;
+                transition:border-color .2s
+            }
+            .form-group input:focus, .form-group textarea:focus {
+                outline:none;
+                border-color:#1677ff;
+                box-shadow:0 0 0 2px rgba(22, 119, 255, .1)
+            }
+            .form-group textarea {
+                min-height:120px;
+                resize:vertical
+            }
+            .form-group .hint {
+                font-size:11px;
+                color:#999;
+                margin-top:3px
+            }
+            .actions {
+                display:flex;
+                gap:10px;
+                margin-top:16px
+            }
+            .btn {
+                padding:8px 20px;
+                border-radius:6px;
+                font-size:13px;
+                font-weight:500;
+                cursor:pointer;
+                border:none;
+                transition:all .2s
+            }
+            .btn-primary {
+                background:#1677ff;
+                color:#fff
+            }
+            .btn-primary:hover {
+                background:#4096ff
+            }
+            .btn-default {
+                background:#f0f0f0;
+                color:#333
+            }
+            .btn-default:hover {
+                background:#e0e0e0
+            }
+            .btn-success {
+                background:#52c41a;
+                color:#fff
+            }
+            .btn-success:hover {
+                background:#73d13d
+            }
+            .btn-warning {
+                background:#fa8c16;
+                color:#fff
+            }
+            .btn-warning:hover {
+                background:#ffa940
+            }
+            .checkbox-row label {
+                display:flex;
+                align-items:center;
+                gap:8px;
+                font-size:13px;
+                font-weight:500;
+                color:#333;
+                cursor:pointer;
+                margin-bottom:4px
+            }
+            .checkbox-row input[type="checkbox"] {
+                width:16px;
+                height:16px;
+                margin:0;
+                cursor:pointer
+            }
+            .alias-table {
+                width:100%;
+                border-collapse:collapse;
+                font-size:13px
+            }
+            .alias-table th {
+                text-align:left;
+                font-weight:500;
+                color:#555;
+                padding:8px 12px;
+                border-bottom:2px solid #f0f0f0;
+                font-size:12px;
+                letter-spacing:.5px
+            }
+            .alias-table td {
+                padding:8px 12px;
+                border-bottom:1px solid #f5f5f5
+            }
+            .alias-table input {
+                width:100%;
+                padding:6px 10px;
+                border:1px solid #d9d9d9;
+                border-radius:4px;
+                font-size:13px;
+                font-family:monospace
+            }
+            .alias-table input:focus {
+                outline:none;
+                border-color:#1677ff
+            }
+            .alias-table th:last-child {
+                width:50px
+            }
+            .alias-table td:last-child {
+                white-space:nowrap;
+                text-align:center
+            }
+            .alias-table .btn {
+                padding:4px 8px;
+                font-size:12px;
+                white-space:nowrap
+            }
+            #toast {
+                position:fixed;
+                top:20px;
+                right:20px;
+                padding:10px 20px;
+                border-radius:6px;
+                font-size:13px;
+                color:#fff;
+                opacity:0;
+                transition:opacity .3s;
+                z-index:999
+            }
+            #toast.success {
+                background:#52c41a
+            }
+            #toast.error {
+                background:#ff4d4f
+            }
+            #toast.show {
+                opacity:1
+            }
+            .empty-hint {
+                color:#aaa;
+                font-size:13px;
+                padding:20px;
+                text-align:center
+            }
+            .hidden {
+                display:none
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="top-bar">
+                <div class="title-group">
+                    <h1>Chat2Responses 管理面板</h1>
+                    <p class="subtitle">Chat Completions → Responses API 转换代理</p>
+                </div>
+                <div class="save-area">
+                    <button class="btn-save-top" onclick="saveConfig()">保存全部</button>
+                </div>
+            </div>
+            <div class="card">
+                <h2>上游与模型</h2>
+                <div class="form-group">
+                    <label>上游 API URL</label>
+                    <input id="upstream_url" placeholder="https://api.openai.com/v1">
+                    <div class="hint">所有请求将被转发到此上游地址的 /chat/completions</div>
+                </div>
+                <div class="form-group">
+                    <label>API Key（可选）</label>
+                    <input id="api_key" type="password" placeholder="sk-xxx" style="font-family:monospace">
+                    <div class="hint">配置后将优先使用此 Key，否则透传请求中的 Authorization Header</div>
+                </div>
+                <div class="form-group">
+                    <label>需要转换的模型列表（逗号分隔）</label>
+                    <input id="model_list" placeholder="deepseek-v4-pro,deepseek-v4-flash">
+                    <div class="hint">匹配的模型会做 reasoning 格式转换；不匹配则直接透传</div>
+                </div>
+                <div id="thinkingSection">
+                    <div class="checkbox-row form-group">
+                        <label>
+                            <input type="checkbox" id="force_disable_thinking">
+                            <strong>强制禁用思考模式</strong>
+                        </label>
+                        <div class="hint">开启后，所有请求的 reasoning 内容将被移除，即使客户端要求 reasoning 也无效</div>
+                    </div>
+                </div>
+                <div class="checkbox-row form-group">
+                    <label>
+                        <input type="checkbox" id="enable_logging">
+                        <strong>启用日志记录</strong>
+                    </label>
+                    <div class="hint">开启后日志写入 chat2responses.log；关闭后仅调试模式输出到控制台</div>
+                </div>
+                <div class="form-group">
+                    <label>管理面板 Token（可选）</label>
+                    <input id="admin_token" type="password" placeholder="留空则无鉴权" style="font-family:monospace">
+                    <div class="hint">设置后访问 /admin 需携带此 Token（Bearer header 或 ?token= 参数）；留空则无鉴权，仅建议本地开发使用</div>
+                </div>
+            </div>
+            <div class="card">
+                <h2>模型别名 (Model Alias)</h2>
+                <table class="alias-table" id="aliasTable">
+                    <thead>
+                        <tr>
+                            <th style="width:35%">别名 (请求名)</th>
+                            <th style="width:42%">实际模型 (上游名)</th>
+                            <th style="width:23%"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="addAliasRow()">添加别名</button>
+                </div>
+            </div>
+            <div class="card">
+                <h2>推理力度映射 (Reasoning Effort)</h2>
+                <table class="alias-table" id="effortTable">
+                    <thead>
+                        <tr>
+                            <th style="width:35%">请求值 (如 low)</th>
+                            <th style="width:42%">映射值 (如 high)</th>
+                            <th style="width:23%"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="addEffortRow()">添加映射</button>
+                </div>
+            </div>
+        </div>
+        <div id="toast"></div>
+        <script>
+            let aliasData = {};
+            let effortData = {};
+
+            async function loadConfig() {
+                try {
+                    const r = await fetch('/admin/api/config');
+                    const cfg = await r.json();
+                    document.getElementById('upstream_url').value = cfg.upstream_url || '';
+                    document.getElementById('api_key').value = cfg.api_key || '';
+                    document.getElementById('model_list').value = cfg.model_list || '';
+                    const el = document.getElementById('enable_logging');
+                    if (el) el.checked = cfg.enable_logging || false;
+                    const fd = document.getElementById('force_disable_thinking');
+                    if (fd) fd.checked = cfg.force_disable_thinking || false;
+                    const at = document.getElementById('admin_token');
+                    if (at) at.value = cfg.admin_token || '';
+                    aliasData = cfg.model_alias || {};
+                    effortData = cfg.reasoning_effort_map || {};
+                    renderAliasTable();
+                    toggleEffortCard();
+                    const et = document.getElementById('effortTable');
+                    if (et) renderEffortTable();
+                } catch (e) {
+                    showToast('加载失败: ' + e.message, 'error');
+                }
+            }
+
+            function renderAliasTable() {
+                const tbody = document.querySelector('#aliasTable tbody');
+                const keys = Object.keys(aliasData);
+                if (keys.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="empty-hint">暂无别名配置</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = keys.map(k => {
+                    const v = aliasData[k] || '';
+                    return '<tr><td><input value="' + esc(k) + '" data-key="' + esc(k) + '" data-field="key"></td><td><input value="' + esc(v) + '" data-field="val"></td><td><button class="btn btn-warning" onclick="delAlias(this,\'' + esc(k) + '\')">删除</button></td></tr>';
+                }).join('');
+            }
+
+            function addAliasRow() {
+                const tbody = document.querySelector('#aliasTable tbody');
+                const emptyRow = tbody.querySelector('.empty-hint');
+                if (emptyRow) tbody.innerHTML = '';
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td><input value="" placeholder="例如: gpt-5.5" data-field="key"></td><td><input value="" placeholder="例如: deepseek-v4-pro" data-field="val"></td><td><button class="btn btn-warning" onclick="delAlias(this,null)">删除</button></td>';
+                tbody.appendChild(tr);
+            }
+
+            function delAlias(btn, key) {
+                if (key) delete aliasData[key];
+                btn.closest('tr').remove();
+                if (Object.keys(aliasData).length === 0) {
+                    document.querySelector('#aliasTable tbody').innerHTML = '<tr><td colspan="3" class="empty-hint">暂无别名配置</td></tr>';
+                }
+            }
+
+            function collectAliases() {
+                const rows = document.querySelectorAll('#aliasTable tbody tr');
+                const result = {};
+                rows.forEach(tr => {
+                    const keyInput = tr.querySelector('[data-field="key"]');
+                    const valInput = tr.querySelector('[data-field="val"]');
+                    if (keyInput && keyInput.value.trim()) {
+                        result[keyInput.value.trim()] = (valInput ? valInput.value.trim() : '');
+                    }
+                });
+                aliasData = result;
+                return result;
+            }
+
+            function renderEffortTable() {
+                const tbody = document.querySelector('#effortTable tbody');
+                const keys = Object.keys(effortData);
+                if (keys.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="empty-hint">暂无映射配置</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = keys.map(k => {
+                    const v = effortData[k] || '';
+                    return '<tr><td><input value="' + esc(k) + '" data-key="' + esc(k) + '" data-field="key"></td><td><input value="' + esc(v) + '" data-field="val"></td><td><button class="btn btn-warning" onclick="delEffort(this,\'' + esc(k) + '\')">删除</button></td></tr>';
+                }).join('');
+            }
+
+            function addEffortRow() {
+                const tbody = document.querySelector('#effortTable tbody');
+                const emptyRow = tbody.querySelector('.empty-hint');
+                if (emptyRow) tbody.innerHTML = '';
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td><input value="" placeholder="例如: low" data-field="key"></td><td><input value="" placeholder="例如: high" data-field="val"></td><td><button class="btn btn-warning" onclick="delEffort(this,null)">删除</button></td>';
+                tbody.appendChild(tr);
+            }
+
+            function delEffort(btn, key) {
+                if (key) delete effortData[key];
+                btn.closest('tr').remove();
+                if (Object.keys(effortData).length === 0) {
+                    document.querySelector('#effortTable tbody').innerHTML = '<tr><td colspan="3" class="empty-hint">暂无映射配置</td></tr>';
+                }
+            }
+
+            function collectEfforts() {
+                const rows = document.querySelectorAll('#effortTable tbody tr');
+                const result = {};
+                rows.forEach(tr => {
+                    const keyInput = tr.querySelector('[data-field="key"]');
+                    const valInput = tr.querySelector('[data-field="val"]');
+                    if (keyInput && keyInput.value.trim()) {
+                        result[keyInput.value.trim()] = (valInput ? valInput.value.trim() : '');
+                    }
+                });
+                effortData = result;
+                return result;
+            }
+
+            async function saveConfig() {
+                const url = document.getElementById('upstream_url').value.trim();
+                const key = document.getElementById('api_key').value.trim();
+                const ml = document.getElementById('model_list').value.trim();
+                // 模型列表为空时，强制禁用思考模式自动取消（避免隐藏状态生效）
+                let fd = document.getElementById('force_disable_thinking').checked;
+                if (!ml) fd = false;
+                const el = document.getElementById('enable_logging').checked;
+                collectAliases();
+                collectEfforts();
+                const cfg = {
+                    upstream_url: url,
+                    api_key: key,
+                    model_list: ml,
+                    model_alias: aliasData,
+                    reasoning_effort_map: effortData,
+                    force_disable_thinking: fd,
+                    enable_logging: el,
+                    admin_token: document.getElementById('admin_token').value.trim()
+                };
+                try {
+                    const r = await fetch('/admin/api/config', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(cfg)
+                    });
+                    if (r.status === 401) {
+                        showToast('鉴权失败：Admin Token 不正确', 'error');
+                        return;
+                    }
+                    if (!r.ok) {
+                        const t = await r.text();
+                        throw new Error(t);
+                    }
+                    showToast('配置已保存', 'success');
+                } catch (e) {
+                    showToast('保存失败: ' + e.message, 'error');
+                }
+            }
+
+            function esc(s) {
+                const d = document.createElement('div');
+                d.textContent = s;
+                return d.innerHTML;
+            }
+
+            function showToast(msg, type) {
+                const t = document.getElementById('toast');
+                t.textContent = msg;
+                t.className = type + ' show';
+                clearTimeout(t._tid);
+                t._tid = setTimeout(() => t.classList.remove('show'), 2500);
+            }
+
+            function toggleEffortCard() {
+                const thinking = document.getElementById('thinkingSection');
+                const ml = document.getElementById('model_list').value.trim();
+                const show = ml ? '' : 'none';
+                if (thinking) thinking.style.display = show;
+            }
+
+            // Auto-auth: detect 401 and prompt for token
+            function tryLoadWithAuth() {
+                fetch('/admin/api/config').then(r => {
+                    if (r.status === 401) {
+                        const token = prompt('管理面板需要鉴权，请输入 Admin Token：');
+                        if (token) {
+                            // Store token in cookie for subsequent requests
+                            document.cookie = 'admin_token=' + encodeURIComponent(token) + ';path=/';
+                            loadConfig();
+                        }
+                    } else {
+                        loadConfig();
+                    }
+                }).catch(() => loadConfig());
+            }
+
+            window.onload = function() {
+                tryLoadWithAuth();
+                document.getElementById('model_list').addEventListener('input', toggleEffortCard);
+            };
+        </script>
+    </body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "upstream_url": "https://api.openai.com/v1",
+  "api_key": "",
+  "model_list": "",
+  "model_alias": {},
+  "reasoning_effort_map": {"low": "high", "medium": "high", "xhigh": "max"},
+  "force_disable_thinking": false,
+  "enable_logging": false,
+  "admin_token": ""
+}

@@ -1,0 +1,20 @@
+# Binary and build output
+chat2responses
+chat2responses.md5
+
+# Config with secrets
+config.json
+
+# IDE
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug log
+chat2responses-debug.log
+chat2responses.log
+
+# Test temp
+/tmp/
