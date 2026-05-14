@@ -5,255 +5,290 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Chat2Responses 管理面板</title>
         <style>
-            * {
-                margin:0;
-                padding:0;
-                box-sizing:border-box
+            :root {
+                --primary: #1677ff;
+                --primary-hover: #4096ff;
+                --primary-bg: rgba(22,119,255,.06);
+                --success: #52c41a;
+                --warning: #fa8c16;
+                --danger: #ff4d4f;
+                --text: #1f1f1f;
+                --text-secondary: #666;
+                --text-hint: #999;
+                --border: #e5e6eb;
+                --bg: #f7f8fa;
+                --card: #fff;
+                --radius: 8px;
+                --shadow: 0 1px 4px rgba(0,0,0,.06);
+                --shadow-lg: 0 4px 16px rgba(0,0,0,.08);
             }
+            * { margin:0; padding:0; box-sizing:border-box }
             body {
-                font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background:#f5f5f5;
-                color:#333;
-                line-height:1.6
+                font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+                background:var(--bg);
+                color:var(--text);
+                line-height:1.6;
+                -webkit-font-smoothing:antialiased
             }
-            .container {
-                max-width:900px;
-                margin:0 auto;
-                padding:24px 16px
-            }
-            h1 {
-                font-size:22px;
-                font-weight:600;
-                margin-bottom:4px
-            }
-            .subtitle {
-                color:#666;
-                font-size:13px;
-                margin-bottom:28px
-            }
+            .container { max-width:920px; margin:0 auto; padding:28px 20px }
+
+            /* 顶栏 */
             .top-bar {
                 display:flex;
                 justify-content:space-between;
                 align-items:center;
-                margin-bottom:28px
+                margin-bottom:32px;
+                padding-bottom:20px;
+                border-bottom:1px solid var(--border)
             }
-            .top-bar .title-group {
-                flex:1
-            }
-            .top-bar .save-area {
-                flex-shrink:0
-            }
+            .top-bar .title-group { flex:1 }
+            h1 { font-size:20px; font-weight:700; margin-bottom:2px; letter-spacing:-.3px }
+            .subtitle { color:var(--text-secondary); font-size:12px; letter-spacing:.2px }
+            .top-bar .save-area { flex-shrink:0; display:flex; align-items:center; gap:8px }
             .btn-save-top {
-                padding:10px 28px;
+                padding:8px 24px;
+                border-radius:var(--radius);
+                font-size:13px;
+                font-weight:600;
+                cursor:pointer;
+                border:none;
+                transition:all .15s;
+                background:var(--primary);
+                color:#fff
+            }
+            .btn-save-top:hover { background:var(--primary-hover) }
+            .btn-save-top:active { transform:scale(.97) }
+            .top-bar .chpwd-btn, .top-bar .logout-btn {
+                padding:8px 14px;
+                border-radius:var(--radius);
+                font-size:12px;
+                cursor:pointer;
+                border:1px solid var(--border);
+                background:var(--card);
+                color:var(--text-secondary);
+                transition:all .15s
+            }
+            .top-bar .chpwd-btn:hover { border-color:var(--primary); color:var(--primary) }
+            .top-bar .logout-btn:hover { border-color:var(--danger); color:var(--danger) }
+
+            /* 卡片 */
+            .card {
+                background:var(--card);
+                border-radius:var(--radius);
+                box-shadow:var(--shadow);
+                padding:24px;
+                margin-bottom:16px;
+                border-left:3px solid var(--primary);
+                transition:box-shadow .15s
+            }
+            .card:hover { box-shadow:var(--shadow-lg) }
+            .card.card-green { border-left-color:var(--success) }
+            .card.card-orange { border-left-color:var(--warning) }
+            .card h2 { font-size:14px; font-weight:600; margin-bottom:16px; color:var(--text); display:flex; align-items:center; gap:8px }
+            .card h2 .icon { font-size:16px; opacity:.7 }
+
+            /* 表单 */
+            .form-group { margin-bottom:14px }
+            .form-group:last-child { margin-bottom:0 }
+            .form-group label { display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px }
+            .form-group input, .form-group textarea {
+                width:100%;
+                padding:9px 12px;
+                border:1px solid var(--border);
                 border-radius:6px;
+                font-size:13px;
+                font-family:'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+                transition:border-color .15s, box-shadow .15s;
+                background:#fafbfc
+            }
+            .form-group input:focus, .form-group textarea:focus {
+                outline:none;
+                border-color:var(--primary);
+                box-shadow:0 0 0 3px var(--primary-bg);
+                background:#fff
+            }
+            .form-group textarea { min-height:120px; resize:vertical }
+            .form-group .hint { font-size:11px; color:var(--text-hint); margin-top:4px; line-height:1.5 }
+
+            /* 复选框 */
+            .checkbox-row label { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; color:var(--text); cursor:pointer; margin-bottom:4px }
+            .checkbox-row input[type="checkbox"] { width:16px; height:16px; margin:0; cursor:pointer; accent-color:var(--primary) }
+
+            /* 按钮 */
+            .actions { display:flex; gap:8px; margin-top:16px }
+            .btn { padding:7px 16px; border-radius:6px; font-size:12px; font-weight:500; cursor:pointer; border:none; transition:all .15s }
+            .btn-primary { background:var(--primary); color:#fff }
+            .btn-primary:hover { background:var(--primary-hover) }
+            .btn-default { background:#f0f1f3; color:var(--text-secondary) }
+            .btn-default:hover { background:#e5e6eb }
+            .btn-warning { background:var(--warning); color:#fff }
+            .btn-warning:hover { background:#ffa940 }
+            .btn-danger-text { background:none; color:var(--danger); border:1px solid var(--danger); padding:4px 10px; font-size:11px }
+            .btn-danger-text:hover { background:var(--danger); color:#fff }
+
+            /* 表格 */
+            .alias-table { width:100%; border-collapse:collapse; font-size:13px }
+            .alias-table th { text-align:left; font-weight:600; color:var(--text-secondary); padding:8px 12px; border-bottom:2px solid var(--border); font-size:11px; letter-spacing:.5px; text-transform:uppercase }
+            .alias-table td { padding:8px 12px; border-bottom:1px solid #f2f3f5 }
+            .alias-table input { width:100%; padding:7px 10px; border:1px solid var(--border); border-radius:4px; font-size:13px; font-family:'SF Mono', monospace; background:#fafbfc; transition:border-color .15s }
+            .alias-table input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 2px var(--primary-bg); background:#fff }
+            .alias-table th:last-child { width:60px }
+            .alias-table td:last-child { white-space:nowrap; text-align:center }
+            .alias-table .btn { padding:4px 10px; font-size:11px; white-space:nowrap }
+
+            /* Toast */
+            #toast {
+                position:fixed;
+                top:24px;
+                right:24px;
+                padding:12px 20px 12px 16px;
+                border-radius:var(--radius);
+                font-size:13px;
+                font-weight:500;
+                color:#fff;
+                opacity:0;
+                transform:translateY(-8px);
+                transition:opacity .25s, transform .25s;
+                z-index:999;
+                display:flex;
+                align-items:center;
+                gap:8px;
+                box-shadow:0 4px 12px rgba(0,0,0,.15)
+            }
+            #toast.success { background:var(--success) }
+            #toast.error { background:var(--danger) }
+            #toast.show { opacity:1; transform:translateY(0) }
+
+            .empty-hint { color:#bbb; font-size:13px; padding:24px; text-align:center }
+
+            /* ========== 登录页 ========== */
+            .login-overlay {
+                position:fixed;
+                top:0;left:0;right:0;bottom:0;
+                background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                z-index:1000
+            }
+            .login-card {
+                background:var(--card);
+                border-radius:16px;
+                box-shadow:0 8px 40px rgba(0,0,0,.2);
+                padding:48px 40px 40px;
+                width:380px;
+                text-align:center
+            }
+            .login-logo {
+                width:56px;
+                height:56px;
+                border-radius:14px;
+                background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                margin:0 auto 20px;
+                font-size:24px;
+                color:#fff;
+                font-weight:700;
+                box-shadow:0 4px 12px rgba(102,126,234,.3)
+            }
+            .login-card h2 { font-size:20px; font-weight:700; margin-bottom:4px; color:var(--text) }
+            .login-card .login-sub { font-size:13px; color:var(--text-hint); margin-bottom:28px }
+            .login-card input {
+                width:100%;
+                padding:11px 14px;
+                border:1px solid var(--border);
+                border-radius:8px;
+                font-size:14px;
+                font-family:'SF Mono', monospace;
+                margin-bottom:16px;
+                transition:border-color .15s, box-shadow .15s;
+                background:#fafbfc
+            }
+            .login-card input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-bg); background:#fff }
+            .login-card .btn-login {
+                width:100%;
+                padding:11px;
+                border-radius:8px;
                 font-size:14px;
                 font-weight:600;
                 cursor:pointer;
                 border:none;
-                transition:all .2s;
-                background:#1677ff;
-                color:#fff
+                background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color:#fff;
+                transition:opacity .15s, transform .1s;
+                box-shadow:0 2px 8px rgba(102,126,234,.3)
             }
-            .btn-save-top:hover {
-                background:#4096ff
-            }
-            .btn-save-top:active {
-                transform:scale(.97)
-            }
-            .card {
-                background:#fff;
-                border-radius:8px;
-                box-shadow:0 1px 3px rgba(0, 0, 0, .08);
-                padding:24px;
-                margin-bottom:20px
-            }
-            .card h2 {
-                font-size:15px;
-                font-weight:600;
-                margin-bottom:16px;
-                color:#222
-            }
-            .form-group {
-                margin-bottom:14px
-            }
-            .form-group:last-child {
-                margin-bottom:0
-            }
-            .form-group label {
-                display:block;
-                font-size:13px;
-                font-weight:500;
-                color:#555;
-                margin-bottom:5px
-            }
-            .form-group input, .form-group textarea {
-                width:100%;
-                padding:8px 12px;
-                border:1px solid #d9d9d9;
-                border-radius:6px;
-                font-size:13px;
-                font-family:monospace;
-                transition:border-color .2s
-            }
-            .form-group input:focus, .form-group textarea:focus {
-                outline:none;
-                border-color:#1677ff;
-                box-shadow:0 0 0 2px rgba(22, 119, 255, .1)
-            }
-            .form-group textarea {
-                min-height:120px;
-                resize:vertical
-            }
-            .form-group .hint {
-                font-size:11px;
-                color:#999;
-                margin-top:3px
-            }
-            .actions {
-                display:flex;
-                gap:10px;
-                margin-top:16px
-            }
-            .btn {
-                padding:8px 20px;
-                border-radius:6px;
-                font-size:13px;
-                font-weight:500;
-                cursor:pointer;
-                border:none;
-                transition:all .2s
-            }
-            .btn-primary {
-                background:#1677ff;
-                color:#fff
-            }
-            .btn-primary:hover {
-                background:#4096ff
-            }
-            .btn-default {
-                background:#f0f0f0;
-                color:#333
-            }
-            .btn-default:hover {
-                background:#e0e0e0
-            }
-            .btn-success {
-                background:#52c41a;
-                color:#fff
-            }
-            .btn-success:hover {
-                background:#73d13d
-            }
-            .btn-warning {
-                background:#fa8c16;
-                color:#fff
-            }
-            .btn-warning:hover {
-                background:#ffa940
-            }
-            .checkbox-row label {
+            .login-card .btn-login:hover { opacity:.9 }
+            .login-card .btn-login:active { transform:scale(.98) }
+            .login-card .login-error { color:var(--danger); font-size:12px; margin-top:10px; min-height:18px }
+            .login-card .login-hint { color:var(--text-hint); font-size:11px; margin-top:16px }
+
+            /* ========== 修改密码弹窗 ========== */
+            .modal-overlay {
+                position:fixed;
+                top:0;left:0;right:0;bottom:0;
+                background:rgba(0,0,0,.4);
                 display:flex;
                 align-items:center;
-                gap:8px;
-                font-size:13px;
-                font-weight:500;
-                color:#333;
-                cursor:pointer;
-                margin-bottom:4px
+                justify-content:center;
+                z-index:1100;
+                animation:fadeIn .15s
             }
-            .checkbox-row input[type="checkbox"] {
-                width:16px;
-                height:16px;
-                margin:0;
-                cursor:pointer
+            @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+            .modal-card {
+                background:var(--card);
+                border-radius:12px;
+                box-shadow:0 8px 32px rgba(0,0,0,.15);
+                padding:28px 32px;
+                width:400px
             }
-            .alias-table {
-                width:100%;
-                border-collapse:collapse;
-                font-size:13px
-            }
-            .alias-table th {
-                text-align:left;
-                font-weight:500;
-                color:#555;
-                padding:8px 12px;
-                border-bottom:2px solid #f0f0f0;
-                font-size:12px;
-                letter-spacing:.5px
-            }
-            .alias-table td {
-                padding:8px 12px;
-                border-bottom:1px solid #f5f5f5
-            }
-            .alias-table input {
-                width:100%;
-                padding:6px 10px;
-                border:1px solid #d9d9d9;
-                border-radius:4px;
-                font-size:13px;
-                font-family:monospace
-            }
-            .alias-table input:focus {
-                outline:none;
-                border-color:#1677ff
-            }
-            .alias-table th:last-child {
-                width:50px
-            }
-            .alias-table td:last-child {
-                white-space:nowrap;
-                text-align:center
-            }
-            .alias-table .btn {
-                padding:4px 8px;
-                font-size:12px;
-                white-space:nowrap
-            }
-            #toast {
-                position:fixed;
-                top:20px;
-                right:20px;
-                padding:10px 20px;
-                border-radius:6px;
-                font-size:13px;
-                color:#fff;
-                opacity:0;
-                transition:opacity .3s;
-                z-index:999
-            }
-            #toast.success {
-                background:#52c41a
-            }
-            #toast.error {
-                background:#ff4d4f
-            }
-            #toast.show {
-                opacity:1
-            }
-            .empty-hint {
-                color:#aaa;
-                font-size:13px;
-                padding:20px;
-                text-align:center
-            }
-            .hidden {
-                display:none
+            .modal-card h3 { font-size:15px; font-weight:600; margin-bottom:20px; color:var(--text) }
+            .modal-card .form-group { margin-bottom:14px }
+            .modal-card .form-group label { display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px }
+            .modal-card .form-group input { width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:6px; font-size:13px; font-family:'SF Mono', monospace; background:#fafbfc }
+            .modal-card .form-group input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-bg); background:#fff }
+            .modal-card .modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:20px }
+            .modal-card .modal-error { color:var(--danger); font-size:12px; margin-top:8px; min-height:18px }
+
+            /* 响应式 */
+            @media (max-width:640px) {
+                .container { padding:16px 12px }
+                .top-bar { flex-wrap:wrap; gap:12px }
+                .top-bar .save-area { width:100%; justify-content:flex-end }
+                .card { padding:16px }
+                .login-card { width:90vw; padding:32px 24px 28px }
             }
         </style>
     </head>
     <body>
-        <div class="container">
+        <!-- 登录页 -->
+        <div class="login-overlay" id="loginOverlay">
+            <div class="login-card">
+                <div class="login-logo">C2R</div>
+                <h2>Chat2Responses</h2>
+                <p class="login-sub">管理面板</p>
+                <input type="password" id="loginToken" placeholder="请输入登录密码" autofocus>
+                <button class="btn-login" onclick="doLogin()">登 录</button>
+                <div class="login-error" id="loginError"></div>
+                <div class="login-hint">未设密码时直接点击登录即可</div>
+            </div>
+        </div>
+        <div class="container" id="mainPanel" style="display:none">
             <div class="top-bar">
                 <div class="title-group">
-                    <h1>Chat2Responses 管理面板</h1>
+                    <h1>Chat2Responses</h1>
                     <p class="subtitle">Chat Completions → Responses API 转换代理</p>
                 </div>
                 <div class="save-area">
                     <button class="btn-save-top" onclick="saveConfig()">保存全部</button>
+                    <button class="chpwd-btn" onclick="showChangePwd()">修改密码</button>
+                    <button class="logout-btn" onclick="doLogout()">退出</button>
                 </div>
             </div>
             <div class="card">
-                <h2>上游与模型</h2>
+                <h2><span class="icon">&#9881;</span> 上游与模型</h2>
                 <div class="form-group">
                     <label>上游 API URL</label>
                     <input id="upstream_url" placeholder="https://api.openai.com/v1">
@@ -261,7 +296,7 @@
                 </div>
                 <div class="form-group">
                     <label>API Key（可选）</label>
-                    <input id="api_key" type="password" placeholder="sk-xxx" style="font-family:monospace">
+                    <input id="api_key" type="password" placeholder="sk-xxx">
                     <div class="hint">配置后将优先使用此 Key，否则透传请求中的 Authorization Header</div>
                 </div>
                 <div class="form-group">
@@ -285,14 +320,9 @@
                     </label>
                     <div class="hint">开启后日志写入 chat2responses.log；关闭后仅调试模式输出到控制台</div>
                 </div>
-                <div class="form-group">
-                    <label>管理面板 Token（可选）</label>
-                    <input id="admin_token" type="password" placeholder="留空则无鉴权" style="font-family:monospace">
-                    <div class="hint">设置后访问 /admin 需携带此 Token（Bearer header 或 ?token= 参数）；留空则无鉴权，仅建议本地开发使用</div>
-                </div>
             </div>
-            <div class="card">
-                <h2>模型别名 (Model Alias)</h2>
+            <div class="card card-green">
+                <h2><span class="icon">&#8618;</span> 模型别名 (Model Alias)</h2>
                 <table class="alias-table" id="aliasTable">
                     <thead>
                         <tr>
@@ -307,8 +337,8 @@
                     <button class="btn btn-primary" onclick="addAliasRow()">添加别名</button>
                 </div>
             </div>
-            <div class="card">
-                <h2>推理力度映射 (Reasoning Effort)</h2>
+            <div class="card card-orange">
+                <h2><span class="icon">&#8620;</span> 推理力度映射 (Reasoning Effort)</h2>
                 <table class="alias-table" id="effortTable">
                     <thead>
                         <tr>
@@ -328,26 +358,87 @@
         <script>
             let aliasData = {};
             let effortData = {};
+            let authToken = '';
+            let maskedAPIKey = '';
+
+            function authFetch(url, opts) {
+                opts = opts || {};
+                opts.headers = opts.headers || {};
+                if (authToken) {
+                    opts.headers['Authorization'] = 'Bearer ' + authToken;
+                }
+                return fetch(url, opts);
+            }
+
+            async function doLogin() {
+                const input = document.getElementById('loginToken');
+                const errEl = document.getElementById('loginError');
+                const token = input.value;
+                errEl.textContent = '';
+                try {
+                    const r = await fetch('/admin/api/config', {
+                        headers: token ? { 'Authorization': 'Bearer ' + token } : {}
+                    });
+                    if (r.status === 401) {
+                        errEl.textContent = '登录密码不正确，请重试';
+                        return;
+                    }
+                    if (!r.ok) {
+                        errEl.textContent = '连接失败: ' + r.status;
+                        return;
+                    }
+                    authToken = token;
+                    localStorage.setItem('c2r_pwd', token);
+                    showMainPanel();
+                    const cfg = await r.json();
+                    applyConfig(cfg);
+                } catch (e) {
+                    errEl.textContent = '网络错误: ' + e.message;
+                }
+            }
+
+            function doLogout() {
+                authToken = '';
+                localStorage.removeItem('c2r_pwd');
+                maskedAPIKey = '';
+                document.getElementById('loginOverlay').style.display = 'flex';
+                document.getElementById('mainPanel').style.display = 'none';
+                document.getElementById('loginToken').value = '';
+                document.getElementById('loginError').textContent = '';
+            }
+
+            function showMainPanel() {
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('mainPanel').style.display = 'block';
+            }
+
+            function applyConfig(cfg) {
+                document.getElementById('upstream_url').value = cfg.upstream_url || '';
+                maskedAPIKey = cfg.api_key || '';
+                document.getElementById('api_key').value = maskedAPIKey;
+                document.getElementById('model_list').value = cfg.model_list || '';
+                const el = document.getElementById('enable_logging');
+                if (el) el.checked = cfg.enable_logging || false;
+                const fd = document.getElementById('force_disable_thinking');
+                if (fd) fd.checked = cfg.force_disable_thinking || false;
+                aliasData = cfg.model_alias || {};
+                effortData = cfg.reasoning_effort_map || {};
+                renderAliasTable();
+                toggleEffortCard();
+                const et = document.getElementById('effortTable');
+                if (et) renderEffortTable();
+            }
 
             async function loadConfig() {
                 try {
-                    const r = await fetch('/admin/api/config');
+                    const r = await authFetch('/admin/api/config');
+                    if (r.status === 401) {
+                        doLogout();
+                        showToast('登录已失效，请重新登录', 'error');
+                        return;
+                    }
                     const cfg = await r.json();
-                    document.getElementById('upstream_url').value = cfg.upstream_url || '';
-                    document.getElementById('api_key').value = cfg.api_key || '';
-                    document.getElementById('model_list').value = cfg.model_list || '';
-                    const el = document.getElementById('enable_logging');
-                    if (el) el.checked = cfg.enable_logging || false;
-                    const fd = document.getElementById('force_disable_thinking');
-                    if (fd) fd.checked = cfg.force_disable_thinking || false;
-                    const at = document.getElementById('admin_token');
-                    if (at) at.value = cfg.admin_token || '';
-                    aliasData = cfg.model_alias || {};
-                    effortData = cfg.reasoning_effort_map || {};
-                    renderAliasTable();
-                    toggleEffortCard();
-                    const et = document.getElementById('effortTable');
-                    if (et) renderEffortTable();
+                    applyConfig(cfg);
                 } catch (e) {
                     showToast('加载失败: ' + e.message, 'error');
                 }
@@ -362,7 +453,7 @@
                 }
                 tbody.innerHTML = keys.map(k => {
                     const v = aliasData[k] || '';
-                    return '<tr><td><input value="' + esc(k) + '" data-key="' + esc(k) + '" data-field="key"></td><td><input value="' + esc(v) + '" data-field="val"></td><td><button class="btn btn-warning" onclick="delAlias(this,\'' + esc(k) + '\')">删除</button></td></tr>';
+                    return '<tr><td><input value="' + esc(k) + '" data-key="' + esc(k) + '" data-field="key"></td><td><input value="' + esc(v) + '" data-field="val"></td><td><button class="btn btn-danger-text" onclick="delAlias(this,\'' + esc(k) + '\')">删除</button></td></tr>';
                 }).join('');
             }
 
@@ -371,7 +462,7 @@
                 const emptyRow = tbody.querySelector('.empty-hint');
                 if (emptyRow) tbody.innerHTML = '';
                 const tr = document.createElement('tr');
-                tr.innerHTML = '<td><input value="" placeholder="例如: gpt-5.5" data-field="key"></td><td><input value="" placeholder="例如: deepseek-v4-pro" data-field="val"></td><td><button class="btn btn-warning" onclick="delAlias(this,null)">删除</button></td>';
+                tr.innerHTML = '<td><input value="" placeholder="例如: gpt-5.5" data-field="key"></td><td><input value="" placeholder="例如: deepseek-v4-pro" data-field="val"></td><td><button class="btn btn-danger-text" onclick="delAlias(this,null)">删除</button></td>';
                 tbody.appendChild(tr);
             }
 
@@ -406,7 +497,7 @@
                 }
                 tbody.innerHTML = keys.map(k => {
                     const v = effortData[k] || '';
-                    return '<tr><td><input value="' + esc(k) + '" data-key="' + esc(k) + '" data-field="key"></td><td><input value="' + esc(v) + '" data-field="val"></td><td><button class="btn btn-warning" onclick="delEffort(this,\'' + esc(k) + '\')">删除</button></td></tr>';
+                    return '<tr><td><input value="' + esc(k) + '" data-key="' + esc(k) + '" data-field="key"></td><td><input value="' + esc(v) + '" data-field="val"></td><td><button class="btn btn-danger-text" onclick="delEffort(this,\'' + esc(k) + '\')">删除</button></td></tr>';
                 }).join('');
             }
 
@@ -415,7 +506,7 @@
                 const emptyRow = tbody.querySelector('.empty-hint');
                 if (emptyRow) tbody.innerHTML = '';
                 const tr = document.createElement('tr');
-                tr.innerHTML = '<td><input value="" placeholder="例如: low" data-field="key"></td><td><input value="" placeholder="例如: high" data-field="val"></td><td><button class="btn btn-warning" onclick="delEffort(this,null)">删除</button></td>';
+                tr.innerHTML = '<td><input value="" placeholder="例如: low" data-field="key"></td><td><input value="" placeholder="例如: high" data-field="val"></td><td><button class="btn btn-danger-text" onclick="delEffort(this,null)">删除</button></td>';
                 tbody.appendChild(tr);
             }
 
@@ -443,9 +534,8 @@
 
             async function saveConfig() {
                 const url = document.getElementById('upstream_url').value.trim();
-                const key = document.getElementById('api_key').value.trim();
+                const keyInput = document.getElementById('api_key').value.trim();
                 const ml = document.getElementById('model_list').value.trim();
-                // 模型列表为空时，强制禁用思考模式自动取消（避免隐藏状态生效）
                 let fd = document.getElementById('force_disable_thinking').checked;
                 if (!ml) fd = false;
                 const el = document.getElementById('enable_logging').checked;
@@ -453,24 +543,23 @@
                 collectEfforts();
                 const cfg = {
                     upstream_url: url,
-                    api_key: key,
+                    api_key: keyInput === maskedAPIKey ? '' : keyInput,
                     model_list: ml,
                     model_alias: aliasData,
                     reasoning_effort_map: effortData,
                     force_disable_thinking: fd,
                     enable_logging: el,
-                    admin_token: document.getElementById('admin_token').value.trim()
+                    login_password: ''
                 };
                 try {
-                    const r = await fetch('/admin/api/config', {
+                    const r = await authFetch('/admin/api/config', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(cfg)
                     });
                     if (r.status === 401) {
-                        showToast('鉴权失败：Admin Token 不正确', 'error');
+                        doLogout();
+                        showToast('登录已失效，请重新登录', 'error');
                         return;
                     }
                     if (!r.ok) {
@@ -478,6 +567,7 @@
                         throw new Error(t);
                     }
                     showToast('配置已保存', 'success');
+                    loadConfig();
                 } catch (e) {
                     showToast('保存失败: ' + e.message, 'error');
                 }
@@ -491,7 +581,8 @@
 
             function showToast(msg, type) {
                 const t = document.getElementById('toast');
-                t.textContent = msg;
+                const icon = type === 'success' ? '&#10003; ' : '&#10007; ';
+                t.innerHTML = icon + esc(msg);
                 t.className = type + ' show';
                 clearTimeout(t._tid);
                 t._tid = setTimeout(() => t.classList.remove('show'), 2500);
@@ -504,25 +595,117 @@
                 if (thinking) thinking.style.display = show;
             }
 
-            // Auto-auth: detect 401 and prompt for token
-            function tryLoadWithAuth() {
-                fetch('/admin/api/config').then(r => {
-                    if (r.status === 401) {
-                        const token = prompt('管理面板需要鉴权，请输入 Admin Token：');
-                        if (token) {
-                            // Store token in cookie for subsequent requests
-                            document.cookie = 'admin_token=' + encodeURIComponent(token) + ';path=/';
-                            loadConfig();
-                        }
-                    } else {
-                        loadConfig();
+            // 修改密码弹窗
+            function showChangePwd() {
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                overlay.id = 'chpwdModal';
+                overlay.onclick = function(e) { if (e.target === overlay) closeChangePwd(); };
+                overlay.innerHTML = '<div class="modal-card">' +
+                    '<h3>修改登录密码</h3>' +
+                    '<div class="form-group"><label>旧密码</label><input type="password" id="chpwdOld" placeholder="未设密码时留空"></div>' +
+                    '<div class="form-group"><label>新密码</label><input type="password" id="chpwdNew" placeholder="留空则取消密码"></div>' +
+                    '<div class="form-group"><label>确认新密码</label><input type="password" id="chpwdConfirm" placeholder="再次输入新密码"></div>' +
+                    '<div class="modal-error" id="chpwdError"></div>' +
+                    '<div class="modal-actions">' +
+                    '<button class="btn btn-default" onclick="closeChangePwd()">取消</button>' +
+                    '<button class="btn btn-primary" onclick="doChangePwd()">确认修改</button>' +
+                    '</div></div>';
+                document.body.appendChild(overlay);
+            }
+
+            function closeChangePwd() {
+                const modal = document.getElementById('chpwdModal');
+                if (modal) modal.remove();
+            }
+
+            async function doChangePwd() {
+                const oldPwd = document.getElementById('chpwdOld').value;
+                const newPwd = document.getElementById('chpwdNew').value;
+                const confirmPwd = document.getElementById('chpwdConfirm').value;
+                const errEl = document.getElementById('chpwdError');
+                errEl.textContent = '';
+                if (newPwd !== confirmPwd) { errEl.textContent = '两次新密码不一致'; return; }
+                try {
+                    const verifyHeaders = oldPwd ? { 'Authorization': 'Bearer ' + oldPwd } : {};
+                    const verifyR = await fetch('/admin/api/config', { headers: verifyHeaders });
+                    if (verifyR.status === 401) {
+                        errEl.textContent = '旧密码不正确';
+                        return;
                     }
-                }).catch(() => loadConfig());
+                    const currentCfg = await verifyR.json();
+                    const saveCfg = {
+                        upstream_url: currentCfg.upstream_url,
+                        api_key: '',
+                        model_list: currentCfg.model_list,
+                        model_alias: currentCfg.model_alias,
+                        reasoning_effort_map: currentCfg.reasoning_effort_map,
+                        force_disable_thinking: currentCfg.force_disable_thinking,
+                        enable_logging: currentCfg.enable_logging,
+                        login_password: newPwd
+                    };
+                    const saveR = await fetch('/admin/api/config', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...(oldPwd ? { 'Authorization': 'Bearer ' + oldPwd } : {})
+                        },
+                        body: JSON.stringify(saveCfg)
+                    });
+                    if (saveR.status === 401) {
+                        errEl.textContent = '鉴权失败';
+                        return;
+                    }
+                    if (!saveR.ok) {
+                        errEl.textContent = '保存失败';
+                        return;
+                    }
+                    authToken = newPwd;
+                    localStorage.setItem('c2r_pwd', newPwd);
+                    closeChangePwd();
+                    showToast('密码已修改', 'success');
+                    loadConfig();
+                } catch (e) {
+                    errEl.textContent = '操作失败: ' + e.message;
+                }
+            }
+
+            // 自动登录
+            async function autoLogin() {
+                const cached = localStorage.getItem('c2r_pwd');
+                if (cached !== null) {
+                    authToken = cached;
+                    try {
+                        const r = await authFetch('/admin/api/config');
+                        if (r.ok) {
+                            showMainPanel();
+                            const cfg = await r.json();
+                            applyConfig(cfg);
+                            return;
+                        }
+                        authToken = '';
+                        localStorage.removeItem('c2r_pwd');
+                    } catch (e) {
+                        authToken = '';
+                    }
+                }
+                try {
+                    const r = await fetch('/admin/api/config');
+                    if (r.ok) {
+                        showMainPanel();
+                        const cfg = await r.json();
+                        applyConfig(cfg);
+                        return;
+                    }
+                } catch (e) {}
             }
 
             window.onload = function() {
-                tryLoadWithAuth();
+                autoLogin();
                 document.getElementById('model_list').addEventListener('input', toggleEffortCard);
+                document.getElementById('loginToken').addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') doLogin();
+                });
             };
         </script>
     </body>

@@ -6,5 +6,5 @@
   "reasoning_effort_map": {"low": "high", "medium": "high", "xhigh": "max"},
   "force_disable_thinking": false,
   "enable_logging": false,
-  "admin_token": ""
+  "login_password": ""
 }

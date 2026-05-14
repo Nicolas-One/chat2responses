@@ -9,6 +9,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -1054,8 +1056,8 @@ func proxyOtherHandler(w http.ResponseWriter, r *http.Request) {
 // ======================== Admin 管理页面 ========================
 
 // requireAdminAuth 检查管理面板鉴权。
-// 当 admin_token 非空时，要求请求携带 Bearer token 或 ?token= 查询参数。
-// 鉴权失败返回 401；admin_token 为空时跳过鉴权（本地开发模式）。
+// 当登录密码非空时，要求请求携带 Bearer token 或 ?token= 查询参数。
+// 鉴权失败返回 401；登录密码为空时跳过鉴权（本地开发模式）。
 func requireAdminAuth(w http.ResponseWriter, r *http.Request) bool {
 	token := getAdminToken()
 	if token == "" {
@@ -1071,8 +1073,8 @@ func requireAdminAuth(w http.ResponseWriter, r *http.Request) bool {
 	if t := r.URL.Query().Get("token"); t == token {
 		return true
 	}
-	// 3. Cookie: admin_token=<token>
-	if c, err := r.Cookie("admin_token"); err == nil && c.Value == token {
+	// 3. Cookie: login_password=<token>
+	if c, err := r.Cookie("login_password"); err == nil && c.Value == token {
 		return true
 	}
 	w.Header().Set("WWW-Authenticate", `Bearer realm="admin"`)
@@ -1104,6 +1106,13 @@ func adminConfigHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, `{"error":"无效的 JSON 格式"}`, http.StatusBadRequest)
 			return
 		}
+		// 前端未修改脱敏字段时提交空值，保留原值
+		if cfg.APIKey == "" {
+			cfg.APIKey = getAPIKey()
+		}
+		if cfg.AdminToken == "" {
+			cfg.AdminToken = getAdminToken()
+		}
 		if err := saveConfig(configPath, cfg); err != nil {
 			http.Error(w, `{"error":"保存配置失败"}`, http.StatusInternalServerError)
 			return
@@ -1132,6 +1141,13 @@ func main() {
 	flag.BoolVar(&debugMode, "debug", false, "启用调试日志")
 	flag.Parse()
 
+	// 将配置路径转为基于二进制所在目录的绝对路径，避免工作目录不同导致读写失败
+	if !filepath.IsAbs(configPath) {
+		exePath, _ := os.Executable()
+		exeDir := filepath.Dir(exePath)
+		configPath = filepath.Join(exeDir, configPath)
+	}
+
 	// 从配置文件加载所有配置
 	cfg := loadConfig(configPath)
 	if cfg.UpstreamURL == "" {
@@ -1150,9 +1166,9 @@ func main() {
 	log.Printf("上游:     %s", getUpstreamURL())
 	log.Printf("转换模型: %s", getModelList())
 	log.Printf("模型别名: %d 条", len(getModelAlias()))
-	adminAuth := "无鉴权"
+	adminAuth := "无密码"
 	if getAdminToken() != "" {
-		adminAuth = "已启用"
+		adminAuth = "已设密码"
 	}
 	log.Printf("管理页面: http://localhost:%s/admin (%s)", port, adminAuth)
 	log.Printf("============================")
@@ -1166,13 +1182,8 @@ func main() {
 		w.Write([]byte("OK"))
 	})
 
-	// Admin 路由（鉴权保护）
-	http.HandleFunc("/admin", func(w http.ResponseWriter, r *http.Request) {
-		if !requireAdminAuth(w, r) {
-			return
-		}
-		adminPageHandler(w, r)
-	})
+	// Admin 页面（始终返回 HTML，鉴权由前端 JS 控制）
+	http.HandleFunc("/admin", adminPageHandler)
 	http.HandleFunc("/admin/api/config", adminConfigHandler)
 
 	// 根页面重定向到 admin

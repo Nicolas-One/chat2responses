@@ -72,7 +72,7 @@ type AppConfig struct {
 	ReasoningEffortMap   map[string]string `json:"reasoning_effort_map"`
 	ForceDisableThinking bool              `json:"force_disable_thinking"`
 	EnableLogging        bool              `json:"enable_logging"`
-	AdminToken           string            `json:"admin_token,omitempty"`
+	AdminToken           string            `json:"login_password,omitempty"`
 }
 
 // ReasonEffort Responses API reasoning 配置

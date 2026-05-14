@@ -114,7 +114,7 @@ func getMaskedAPIKey() string {
 	return "****" + key[len(key)-4:]
 }
 
-// getAdminTokenMasked 返回脱敏后的管理面板 Token，用于管理页面展示。
+// getAdminTokenMasked 返回脱敏后的登录密码，用于管理页面展示。
 func getAdminTokenMasked() string {
 	token := getAdminToken()
 	if token == "" {
@@ -169,7 +169,7 @@ func getForceDisableThinking() bool {
 	return forceDisableThinking
 }
 
-// getAdminToken 线程安全地获取管理面板鉴权 Token。
+// getAdminToken 线程安全地获取登录密码。
 func getAdminToken() string {
 	configMu.RLock()
 	defer configMu.RUnlock()
